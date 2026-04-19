@@ -20,3 +20,14 @@ rm -rf /sdcard/Android/data/com.tencent.ig/files/UE4Game/ShadowTrackerExtra/Shad
 
 # مسح قيم الـ XML التي تحتوي على UUID الخاص بك
 sed -i 's/uuid">.*/uuid"><\/string>/g' /data/data/com.tencent.ig/shared_prefs/device_id.xml
+# --- قسم حظر السيرفرات العالمي (Global Server Block) ---
+
+# حظر السيرفرات المسؤولة عن "الباند اليدوي" ومراقبة اللعب
+iptables -A OUTPUT -d isds.tencent.com -j REJECT
+iptables -A OUTPUT -d telemetry.tencent.com -j REJECT
+iptables -A OUTPUT -d msdksdp.itopgame.com -j REJECT
+iptables -A OUTPUT -d cloud.gsdk.tencent.com -j REJECT
+
+# حظر عناوين الـ IP الخاصة بجمع بيانات الجهاز
+iptables -A OUTPUT -d 129.226.110.155 -j REJECT
+iptables -A OUTPUT -d 43.152.122.103 -j REJECT
