@@ -9,3 +9,14 @@ iptables -A OUTPUT -d crashsight.tencent.com -j REJECT
 find /sdcard/Android/data/com.tencent.ig/files -name "*Logs*" -exec rm -rf {} +
 find /sdcard/Android/data/com.tencent.ig/files -name "apollo*" -exec rm -rf {} +
 find /sdcard/Android/data/com.tencent.ig/files -name "turing*" -exec rm -rf {} +
+# --- قسم تصفير بصمة الجهاز (Device ID Reset) ---
+
+# مسح معرف الأندرويد المخزن في ملفات اللعبة
+rm -rf /data/data/com.tencent.ig/files/login-identifier.txt
+rm -rf /data/data/com.tencent.ig/files/device_id.txt
+
+# مسح ملفات التعريف الخاصة بمتجر جوجل داخل اللعبة
+rm -rf /sdcard/Android/data/com.tencent.ig/files/UE4Game/ShadowTrackerExtra/ShadowTrackerExtra/Saved/Paks/Puffer_Temp
+
+# مسح قيم الـ XML التي تحتوي على UUID الخاص بك
+sed -i 's/uuid">.*/uuid"><\/string>/g' /data/data/com.tencent.ig/shared_prefs/device_id.xml
