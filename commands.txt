@@ -1,0 +1,11 @@
+# 1. حظر سيرفرات الحماية الرئيسية (Global)
+iptables -A OUTPUT -d anticheatexpert.com -j REJECT
+iptables -A OUTPUT -d igamecj.com -j REJECT
+
+# 2. حظر منافذ البيانات المشبوهة
+iptables -A OUTPUT -p tcp --dport 17500 -j REJECT
+iptables -A OUTPUT -p udp --dport 17500 -j REJECT
+
+# 3. مسح سجلات اللعبة (Logs) فوراً لمنع كشف الروت
+rm -rf /sdcard/Android/data/com.tencent.ig/files/UE4Game/ShadowTrackerExtra/ShadowTrackerExtra/Saved/Logs/*
+rm -rf /sdcard/Android/data/com.tencent.ig/files/UE4Game/ShadowTrackerExtra/ShadowTrackerExtra/Saved/Paks/apollo*
