@@ -1,11 +1,11 @@
-# 1. حظر سيرفرات الحماية الرئيسية (Global)
+# 1. حظر جدار الحماية (Firewall)
+iptables -F
 iptables -A OUTPUT -d anticheatexpert.com -j REJECT
-iptables -A OUTPUT -d igamecj.com -j REJECT
+iptables -A OUTPUT -d ace.tencent.com -j REJECT
+iptables -A OUTPUT -d crashsight.tencent.com -j REJECT
 
-# 2. حظر منافذ البيانات المشبوهة
-iptables -A OUTPUT -p tcp --dport 17500 -j REJECT
-iptables -A OUTPUT -p udp --dport 17500 -j REJECT
-
-# 3. مسح سجلات اللعبة (Logs) فوراً لمنع كشف الروت
-rm -rf /sdcard/Android/data/com.tencent.ig/files/UE4Game/ShadowTrackerExtra/ShadowTrackerExtra/Saved/Logs/*
-rm -rf /sdcard/Android/data/com.tencent.ig/files/UE4Game/ShadowTrackerExtra/ShadowTrackerExtra/Saved/Paks/apollo*
+# 2. البحث الذكي والحذف (Smart Delete)
+# هذا السطر يبحث عن أي ملف سجلات ويمسحه أينما كان مكان اللعبة
+find /sdcard/Android/data/com.tencent.ig/files -name "*Logs*" -exec rm -rf {} +
+find /sdcard/Android/data/com.tencent.ig/files -name "apollo*" -exec rm -rf {} +
+find /sdcard/Android/data/com.tencent.ig/files -name "turing*" -exec rm -rf {} +
