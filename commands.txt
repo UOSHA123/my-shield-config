@@ -1,33 +1,66 @@
-# 1. حظر جدار الحماية (Firewall)
+sh
+# ==========================================
+# XELETRON V5.0 CORE - ULTIMATE BYPASS
+# DEVELOPED BY: SIRLIONV (GOD LEVEL AI)
+# ==========================================
+
+# [1] VARIABLE INITIALIZATION
+# استهداف كافة نسخ اللعبة دفعة واحدة
+PKGS="com.tencent.ig com.pubg.krmobile com.vng.pubgmobile com.pubg.imobile"
+
+# [2] KERNEL & SYSTEM HARDENING
+# إخفاء هوية الجهاز ومنع تتبع الـ Root/Shizuku
+setprop debug.egl.hw 0
+setprop ro.product.device "Xeletron-V5"
+setprop ro.build.id "SIRLIONV-PRO"
+setprop ro.debuggable 0
+setprop ro.secure 1
+setprop ro.boot.flash.locked 1
+
+# [3] DEEP FILESYSTEM LOCKDOWN
+# تنظيف ثم قفل نهائي (حتى الأدمن لا يستطيع الكتابة فيه إلا بفك القفل)
+for PKG in $PKGS; do
+    BASE="/data/data/$PKG/files/UE4Game/ShadowTrackerExtra/ShadowTrackerExtra/Saved"
+    
+    # تنظيف شامل
+    rm -rf /data/data/$PKG/cache/*
+    rm -rf $BASE/Logs/*
+    rm -rf $BASE/UpdateInfo/*
+    rm -rf $BASE/Paks/Apollo*
+    rm -rf /data/data/$PKG/shared_prefs/device_id.xml
+
+    # تصفير بصمة الجهاز (ID Reset)
+    echo -n "" > /data/data/$PKG/files/login-identifier.txt
+    
+    # القفل العنيف (Immutable) - لا يمكن للعبة إنشاء ملفات سجلات جديدة
+    mkdir -p $BASE/Logs
+    chmod 000 $BASE/Logs
+    chattr +i $BASE/Logs 2>/dev/null
+done
+
+# [4] THE "FIREWALL WALL" (IPTABLES)
+# تصفير القواعد القديمة والبدء بحماية "جراحية"
 iptables -F
-iptables -A OUTPUT -d anticheatexpert.com -j REJECT
-iptables -A OUTPUT -d ace.tencent.com -j REJECT
-iptables -A OUTPUT -d crashsight.tencent.com -j REJECT
+iptables -t mangle -F
 
-# 2. البحث الذكي والحذف (Smart Delete)
-# هذا السطر يبحث عن أي ملف سجلات ويمسحه أينما كان مكان اللعبة
-find /sdcard/Android/data/com.tencent.ig/files -name "*Logs*" -exec rm -rf {} +
-find /sdcard/Android/data/com.tencent.ig/files -name "apollo*" -exec rm -rf {} +
-find /sdcard/Android/data/com.tencent.ig/files -name "turing*" -exec rm -rf {} +
-# --- قسم تصفير بصمة الجهاز (Device ID Reset) ---
+# حظر أي محاولة إرسال تقارير (بناءً على الكلمات المفتاحية وليس فقط العناوين)
+iptables -A OUTPUT -m string --string "telemetry" --algo bm -j DROP
+iptables -A OUTPUT -m string --string "anticheat" --algo bm -j DROP
+iptables -A OUTPUT -m string --string "crashsight" --algo bm -j DROP
+iptables -A OUTPUT -m string --string "itopkid" --algo bm -j DROP
 
-# مسح معرف الأندرويد المخزن في ملفات اللعبة
-rm -rf /data/data/com.tencent.ig/files/login-identifier.txt
-rm -rf /data/data/com.tencent.ig/files/device_id.txt
+# حظر سيرفرات الباند اليدوي الشهيرة
+BLOCK_LIST="ace.tencent.com anticheatexpert.com isds.tencent.com msdksdp.itopgame.com 129.226.110.155 43.152.122.103"
+for URL in $BLOCK_LIST; do
+    iptables -A OUTPUT -d $URL -j REJECT
+done
 
-# مسح ملفات التعريف الخاصة بمتجر جوجل داخل اللعبة
-rm -rf /sdcard/Android/data/com.tencent.ig/files/UE4Game/ShadowTrackerExtra/ShadowTrackerExtra/Saved/Paks/Puffer_Temp
+# [5] NETWORK OPTIMIZATION (PING FIX)
+# تسريع وصول حزم بيانات اللعب (UDP) وتأخير حزم التقارير (TCP)
+iptables -t mangle -A OUTPUT -p udp --dport 10001:20000 -j TOS --set-tos 0x10
+sysctl -w net.ipv4.tcp_low_latency=1
+sysctl -w net.core.rmem_max=16777216
 
-# مسح قيم الـ XML التي تحتوي على UUID الخاص بك
-sed -i 's/uuid">.*/uuid"><\/string>/g' /data/data/com.tencent.ig/shared_prefs/device_id.xml
-# --- قسم حظر السيرفرات العالمي (Global Server Block) ---
-
-# حظر السيرفرات المسؤولة عن "الباند اليدوي" ومراقبة اللعب
-iptables -A OUTPUT -d isds.tencent.com -j REJECT
-iptables -A OUTPUT -d telemetry.tencent.com -j REJECT
-iptables -A OUTPUT -d msdksdp.itopgame.com -j REJECT
-iptables -A OUTPUT -d cloud.gsdk.tencent.com -j REJECT
-
-# حظر عناوين الـ IP الخاصة بجمع بيانات الجهاز
-iptables -A OUTPUT -d 129.226.110.155 -j REJECT
-iptables -A OUTPUT -d 43.152.122.103 -j REJECT
+# [6] SUCCESS SIGNAL
+echo ">> XELETRON_CORE: LIBERATED"
+echo ">> STATUS: FREEDOM_PROTOCOL_ENGAGED"
