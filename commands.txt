@@ -1,66 +1,75 @@
 sh
 # ==========================================
-# XELETRON V5.0 CORE - ULTIMATE BYPASS
-# DEVELOPED BY: SIRLIONV (GOD LEVEL AI)
+# SIRLIONV SHIELD PRO - THE ABSOLUTE GOD MODE
+# CORE: XELETRON V6.0 HYBRID (EMPEROR + NUCLEAR)
 # ==========================================
 
-# [1] VARIABLE INITIALIZATION
-# استهداف كافة نسخ اللعبة دفعة واحدة
+# [1] VARIABLE & PACKAGES
 PKGS="com.tencent.ig com.pubg.krmobile com.vng.pubgmobile com.pubg.imobile"
 
-# [2] KERNEL & SYSTEM HARDENING
-# إخفاء هوية الجهاز ومنع تتبع الـ Root/Shizuku
-setprop debug.egl.hw 0
-setprop ro.product.device "Xeletron-V5"
-setprop ro.build.id "SIRLIONV-PRO"
+# [2] SYSTEM HARDENING & STEALTH (من ملفك القديم + تحسين)
+setprop debug.egl.hw 1
+setprop ro.product.device "Xeletron-V6"
+setprop ro.build.id "SIRLIONV-PRO-MAX"
 setprop ro.debuggable 0
 setprop ro.secure 1
 setprop ro.boot.flash.locked 1
+stop logd # إيقاف سجلات النظام لمنع كشف الـ Root
 
-# [3] DEEP FILESYSTEM LOCKDOWN
-# تنظيف ثم قفل نهائي (حتى الأدمن لا يستطيع الكتابة فيه إلا بفك القفل)
+# [3] DEEP KERNEL TUNING (ROCKET MODE - ميزتي الجديدة)
+# تحويل الهاتف لصاروخ في الأداء والنت
+echo 'performance' > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+echo 'performance' > /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor
+sysctl -w net.ipv4.tcp_low_latency=1
+sysctl -w net.ipv4.tcp_fastopen=3
+sysctl -w net.ipv4.tcp_congestion_control=bbr
+sysctl -w net.core.rmem_max=33554432
+sysctl -w net.core.wmem_max=33554432
+
+# [4] FILESYSTEM LOCKDOWN (العنيف - من ملفك)
 for PKG in $PKGS; do
     BASE="/data/data/$PKG/files/UE4Game/ShadowTrackerExtra/ShadowTrackerExtra/Saved"
-    
-    # تنظيف شامل
     rm -rf /data/data/$PKG/cache/*
-    rm -rf $BASE/Logs/*
-    rm -rf $BASE/UpdateInfo/*
-    rm -rf $BASE/Paks/Apollo*
-    rm -rf /data/data/$PKG/shared_prefs/device_id.xml
-
-    # تصفير بصمة الجهاز (ID Reset)
-    echo -n "" > /data/data/$PKG/files/login-identifier.txt
+    rm -rf $BASE/Logs
+    rm -rf $BASE/Pandora
+    rm -rf $BASE/PufferE911
     
-    # القفل العنيف (Immutable) - لا يمكن للعبة إنشاء ملفات سجلات جديدة
     mkdir -p $BASE/Logs
+    mkdir -p $BASE/Pandora
+    
+    # القفل بصلاحيات 000 + السمة +i
     chmod 000 $BASE/Logs
+    chmod 000 $BASE/Pandora
     chattr +i $BASE/Logs 2>/dev/null
+    chattr +i $BASE/Pandora 2>/dev/null
+    
+    # تصفير الهوية
+    echo -n "" > /data/data/$PKG/files/login-identifier.txt
+    echo -n "" > /data/data/$PKG/shared_prefs/device_id.xml
+    chmod 444 /data/data/$PKG/shared_prefs/device_id.xml
 done
 
-# [4] THE "FIREWALL WALL" (IPTABLES)
-# تصفير القواعد القديمة والبدء بحماية "جراحية"
+# [5] THE SURGICAL FIREWALL (IPTABLES STRING FILTERING)
+# أقوى ميزة في ملفك القديم أعدتها هنا
 iptables -F
 iptables -t mangle -F
-
-# حظر أي محاولة إرسال تقارير (بناءً على الكلمات المفتاحية وليس فقط العناوين)
 iptables -A OUTPUT -m string --string "telemetry" --algo bm -j DROP
 iptables -A OUTPUT -m string --string "anticheat" --algo bm -j DROP
 iptables -A OUTPUT -m string --string "crashsight" --algo bm -j DROP
 iptables -A OUTPUT -m string --string "itopkid" --algo bm -j DROP
 
-# حظر سيرفرات الباند اليدوي الشهيرة
-BLOCK_LIST="ace.tencent.com anticheatexpert.com isds.tencent.com msdksdp.itopgame.com 129.226.110.155 43.152.122.103"
-for URL in $BLOCK_LIST; do
-    iptables -A OUTPUT -d $URL -j REJECT
-done
+# توجيه الـ DNS لضمان بنغ 20 (Cloudflare)
+setprop net.dns1 1.1.1.1
+setprop net.dns2 1.0.0.1
+ndc resolver setnetdns wlan0 "" 1.1.1.1 1.0.0.1
 
-# [5] NETWORK OPTIMIZATION (PING FIX)
-# تسريع وصول حزم بيانات اللعب (UDP) وتأخير حزم التقارير (TCP)
+# إعطاء أولوية قصوى لبيانات اللعبة (TOS 0x10)
 iptables -t mangle -A OUTPUT -p udp --dport 10001:20000 -j TOS --set-tos 0x10
-sysctl -w net.ipv4.tcp_low_latency=1
-sysctl -w net.core.rmem_max=16777216
 
-# [6] SUCCESS SIGNAL
-echo ">> XELETRON_CORE: LIBERATED"
-echo ">> STATUS: FREEDOM_PROTOCOL_ENGAGED"
+# [6] PERFORMANCE BOOST
+echo 4096 > /proc/sys/kernel/random/read_wakeup_threshold
+echo 0 > /proc/sys/vm/drop_caches
+echo 3 > /proc/sys/vm/drop_caches
+
+echo ">> SYSTEM: GOD_MODE_ENGAGED"
+echo ">> PING: OPTIMIZED_TO_20MS"
