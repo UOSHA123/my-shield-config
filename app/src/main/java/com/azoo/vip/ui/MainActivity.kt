@@ -54,6 +54,9 @@ fun MainScreen(activity: MainActivity) {
 
     LaunchedEffect(Unit) {
         deviceModel = ProtectionCore.getDeviceInfo()
+        // Sync with GitHub on startup
+        com.azoo.vip.core.SirLionV.syncWithCloud(activity)
+
         while (true) {
             val pid = ProtectionCore.getGamePid()
             isGameRunning = pid != -1
@@ -77,6 +80,15 @@ fun MainScreen(activity: MainActivity) {
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                item {
+                    FeatureCard(
+                        title = "بروتوكول الحرية (Full Freedom)",
+                        subtitle = "Execute all Xeletron protocols at once",
+                        icon = "🔥",
+                        onClick = { com.azoo.vip.core.SirLionV.fullFreedom(activity) }
+                    )
+                }
+
                 item {
                     FeatureCard(
                         title = "مسرع الإنترنت (20MS)",

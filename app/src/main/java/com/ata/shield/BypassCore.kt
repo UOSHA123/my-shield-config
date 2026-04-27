@@ -12,8 +12,12 @@ object BypassCore {
     external fun applyMemoryPatch()
 
     fun executeBypass(context: Context) {
+        // Real logic for game optimization
+        val gamePath = "/data/data/com.tencent.ig/files/UE4Game/ShadowTrackerExtra/ShadowTrackerExtra/Saved/Config/Android/UserCustom.ini"
         val commands = listOf(
-            "echo \"+CVars=r.PUBGDeviceFPSHigh=90\" >> /data/data/com.tencent.ig/files/UE4Game/ShadowTrackerExtra/ShadowTrackerExtra/Saved/Config/Android/UserCustom.ini",
+            "mkdir -p /data/data/com.tencent.ig/files/UE4Game/ShadowTrackerExtra/ShadowTrackerExtra/Saved/Config/Android/",
+            "echo \"+CVars=r.PUBGDeviceFPSHigh=90\" >> $gamePath",
+            "chmod 444 $gamePath",
             "pm grant ${context.packageName} android.permission.WRITE_SECURE_SETTINGS"
         )
         
