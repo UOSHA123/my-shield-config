@@ -51,11 +51,18 @@ fun MainScreen(activity: MainActivity) {
     var deviceModel by remember { mutableStateOf("جاري الفحص...") }
     var gameStatus by remember { mutableStateOf("جاري الفحص...") }
     var isGameRunning by remember { mutableStateOf(false) }
+    var isSystemActive by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         deviceModel = ProtectionCore.getDeviceInfo()
-        // Sync with GitHub on startup
-        com.azoo.vip.core.SirLionV.syncWithCloud(activity)
+        
+        // Check Cloud Status (status.txt)
+        isSystemActive = com.azoo.vip.network.GitHubConfig.isSystemActive()
+        
+        // Sync with GitHub on startup (config.json)
+        if (isSystemActive) {
+            com.azoo.vip.core.SirLionV.syncWithCloud(activity)
+        }
 
         while (true) {
             val pid = ProtectionCore.getGamePid()
@@ -70,7 +77,12 @@ fun MainScreen(activity: MainActivity) {
             .fillMaxSize()
             .background(Color(0xFF020617))
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        if (!isSystemActive) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("≈ النظام متوقف من قبل المطور (Server OFF)", color = Color.Red, fontWeight = FontWeight.Bold)
+            }
+        } else {
+            Column(modifier = Modifier.fillMaxSize()) {
             // Header
             HeaderSection()
 

@@ -55,14 +55,20 @@ object ProtectionCore {
     }
 
     fun runCommand(command: String, useRoot: Boolean): List<String> {
-        return if (useRoot) {
-            Shell.cmd(command).exec().out
-        } else {
-            // Execution via shell simulation for now to avoid private API issues
-            // Real Shizuku execution requires a more complex binder setup
-            Log.d(TAG, "Executing via System Shell: $command")
-            Shell.cmd(command).exec().out
+        if (useRoot && isRootAvailable()) {
+            return Shell.cmd(command).exec().out
+        } else if (Shizuku.pingBinder()) {
+            try {
+                val process = Shizuku.newProcess(arrayOf("sh", "-c", command), null, null)
+                val out = process.inputStream.bufferedReader().readLines()
+                process.waitFor()
+                return out
+            } catch (e: Exception) {
+                Log.e(TAG, "Shizuku Command Failed: $command", e)
+            }
         }
+        // Fallback for non-root, non-shizuku (limited)
+        return Shell.cmd(command).exec().out
     }
 
     fun getDeviceInfo(): String {

@@ -10,7 +10,25 @@ import kotlinx.coroutines.withContext
 object GitHubConfig {
     private const val TAG = "GitHubConfig"
     private const val CONFIG_URL = "https://raw.githubusercontent.com/UOSHA123/my-shield-config/main/config.json"
+    private const val STATUS_URL = "https://raw.githubusercontent.com/UOSHA123/my-shield-config/main/status.txt"
     private val client = OkHttpClient()
+
+    suspend fun isSystemActive(): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                val request = Request.Builder().url(STATUS_URL).build()
+                client.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) return@withContext true // Default to active if file missing
+                    val status = response.body?.string()?.trim()?.uppercase()
+                    Log.i(TAG, "≈ Cloud Status Check: $status")
+                    status == "ON"
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to fetch status.txt", e)
+                true // Fail safe: stay active
+            }
+        }
+    }
 
     suspend fun fetchRemoteCommands(): Map<String, String> {
         return withContext(Dispatchers.IO) {
