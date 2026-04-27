@@ -1,0 +1,28 @@
+# Android Studio / IntelliJ
+.idea/
+*.iml
+.gradle/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+.DS_Store
+
+# Capacitor
+node_modules/
+public/
+
+# Native binaries
+*.so
+*.apk
+*.aab
+
+# Keystore
+*.jks
+*.p12
+*.keystore
+*.jks-orig
+
+# Logs
+*.log
